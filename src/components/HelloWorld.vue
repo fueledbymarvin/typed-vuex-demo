@@ -12,13 +12,10 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { data } from "@/store";
+import vx from "@/store";
 
 export default Vue.extend({
   name: "HelloWorld",
-  props: {
-    msg: String,
-  },
   data() {
     return {
       id: 0,
@@ -28,16 +25,16 @@ export default Vue.extend({
     // typechecker knows what strings are possible here but trying to map a
     // nested item directly from the root context does not work with the type
     // checker, e.g., it won't recognize "nested/greeting"
-    ...data.modules.nested.mapper.mapGetters(["greeting"]),
+    ...vx.modules.nested.mapper.mapGetters(["greeting"]),
     foos() {
-      return Object.entries(data.context.state.foo).map(([k, v]) => [
+      return Object.entries(vx.context.state.fooById).map(([k, v]) => [
         k,
         v.count,
       ]);
     },
   },
   methods: {
-    ...data.mapper.mapActions(["registerFoo", "unregisterFoo"]),
+    ...vx.modules.fooById.mapper.mapActions(["registerFoo", "unregisterFoo"]),
     register() {
       this.id = this.id + 1;
       this.registerFoo({ id: this.id.toString() });
@@ -46,7 +43,7 @@ export default Vue.extend({
       // accessing dynamically registered nested modules doesn't work since
       // vuex-smart-module doesn't know about them during initialization so we
       // have to use the special object we created
-      data.modules.foo.modules[id].context.mutations.increment(1);
+      vx.modules.fooById.modules[id].context.mutations.increment(1);
     },
   },
 });
